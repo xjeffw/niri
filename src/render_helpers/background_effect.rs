@@ -14,7 +14,7 @@ use crate::render_helpers::framebuffer_effect::{FramebufferEffect, FramebufferEf
 use crate::render_helpers::xray::{XrayElement, XrayPos};
 use crate::render_helpers::RenderCtx;
 use crate::utils::region::TransformedRegion;
-use crate::utils::surface_geo;
+use crate::utils::{surface_alpha, surface_geo};
 
 #[derive(Debug)]
 pub struct BackgroundEffect {
@@ -154,6 +154,7 @@ impl BackgroundEffect {
         ns: Option<usize>,
         mut params: RenderParams,
         xray_pos: XrayPos,
+        alpha: f32,
         push: &mut dyn FnMut(BackgroundEffectElement),
     ) {
         if !self.is_visible() {
@@ -193,13 +194,14 @@ impl BackgroundEffect {
                 blur,
                 noise,
                 saturation,
+                alpha,
                 &mut |elem| push(elem.into()),
             );
         } else {
             // Render non-xray effect.
             let elem = self
                 .nonxray
-                .render(ns, params, blur_options, noise, saturation);
+                .render(ns, params, blur_options, noise, saturation, alpha);
             push(elem.into());
         }
     }
@@ -327,6 +329,8 @@ pub fn render_for_tile(
         };
 
         let xray_pos = xray_pos.offset(params.geometry.loc - geometry.loc);
-        background_effect.render(ctx, ns, params, xray_pos, push);
+        // Fade the effect along with the surface when it uses wp_alpha_modifier.
+        let alpha = surface_alpha(states);
+        background_effect.render(ctx, ns, params, xray_pos, alpha, push);
     });
 }

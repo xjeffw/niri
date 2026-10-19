@@ -100,6 +100,8 @@ pub struct BakedBuffer<B> {
     pub location: Point<f64, Logical>,
     pub src: Option<Rectangle<f64, Logical>>,
     pub dst: Option<Size<i32, Logical>>,
+    /// Alpha multiplier, e.g. from the surface's wp_alpha_modifier.
+    pub alpha: f32,
 }
 
 pub trait ToRenderElement {
@@ -139,7 +141,7 @@ impl ToRenderElement for BakedBuffer<TextureBuffer<GlesTexture>> {
         let elem = TextureRenderElement::from_texture_buffer(
             self.buffer.clone(),
             location + self.location,
-            alpha,
+            alpha * self.alpha,
             self.src,
             self.dst.map(|dst| dst.to_f64()),
             kind,
@@ -158,7 +160,12 @@ impl ToRenderElement for BakedBuffer<SolidColorBuffer> {
         alpha: f32,
         kind: Kind,
     ) -> Self::RenderElement {
-        SolidColorRenderElement::from_buffer(&self.buffer, location + self.location, alpha, kind)
+        SolidColorRenderElement::from_buffer(
+            &self.buffer,
+            location + self.location,
+            alpha * self.alpha,
+            kind,
+        )
     }
 }
 

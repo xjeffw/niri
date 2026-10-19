@@ -9,6 +9,7 @@ use smithay::wayland::compositor::{with_surface_tree_downward, TraversalAction};
 
 use super::texture::TextureBuffer;
 use super::BakedBuffer;
+use crate::utils::surface_alpha;
 
 /// Renders elements from a surface tree as textures into `storage`.
 pub fn render_snapshot_from_surface_tree(
@@ -72,6 +73,7 @@ pub fn render_snapshot_from_surface_tree(
                     location,
                     src: Some(view.src),
                     dst: Some(view.dst),
+                    alpha: surface_alpha(states),
                 };
 
                 storage.push(baked);

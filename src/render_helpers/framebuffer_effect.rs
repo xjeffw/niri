@@ -38,6 +38,7 @@ pub struct FramebufferEffectElement {
     blur_options: Option<BlurOptions>,
     noise: f32,
     saturation: f32,
+    alpha: f32,
 }
 
 #[derive(Debug)]
@@ -68,6 +69,7 @@ impl FramebufferEffect {
         blur_options: Option<BlurOptions>,
         noise: f32,
         saturation: f32,
+        alpha: f32,
     ) -> FramebufferEffectElement {
         let (clip_geo, corner_radius) = params
             .clip
@@ -89,6 +91,7 @@ impl FramebufferEffect {
             blur_options,
             noise,
             saturation,
+            alpha,
         }
     }
 }
@@ -149,6 +152,10 @@ impl Element for FramebufferEffectElement {
 
     fn is_framebuffer_effect(&self) -> bool {
         true
+    }
+
+    fn alpha(&self) -> f32 {
+        self.alpha
     }
 }
 
@@ -402,7 +409,7 @@ impl RenderElement<GlesRenderer> for FramebufferEffectElement {
             &[],
             // The intermediate texture has the same transform as the frame.
             frame.transformation().invert(),
-            1.,
+            self.alpha,
             program.as_ref(),
             uniforms,
         )

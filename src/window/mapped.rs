@@ -419,6 +419,7 @@ impl Mapped {
             location: Point::from((0., 0.)),
             src: None,
             dst: None,
+            alpha: 1.,
         }];
 
         let buf_pos = self.window.geometry().loc.upscale(-1).to_f64();

@@ -71,6 +71,7 @@ use smithay::utils::{
     ClockSource, IsAlive as _, Logical, Monotonic, Physical, Point, Rectangle, Scale, Size,
     Transform, SERIAL_COUNTER,
 };
+use smithay::wayland::alpha_modifier::AlphaModifierState;
 use smithay::wayland::background_effect::BackgroundEffectState;
 use smithay::wayland::compositor::{
     with_states, with_surface_tree_downward, CompositorClientState, CompositorHandler,
@@ -283,6 +284,7 @@ pub struct Niri {
     pub output_management_state: OutputManagementManagerState,
     pub viewporter_state: ViewporterState,
     pub background_effect_state: BackgroundEffectState,
+    pub alpha_modifier_state: AlphaModifierState,
     pub xdg_foreign_state: XdgForeignState,
     pub shm_state: ShmState,
     pub output_manager_state: OutputManagerState,
@@ -2343,6 +2345,7 @@ impl Niri {
             ScreencopyManagerState::new::<State, _>(&display_handle, client_is_unrestricted);
         let viewporter_state = ViewporterState::new::<State>(&display_handle);
         let background_effect_state = BackgroundEffectState::new::<State>(&display_handle);
+        let alpha_modifier_state = AlphaModifierState::new::<State>(&display_handle);
         let xdg_foreign_state = XdgForeignState::new::<State>(&display_handle);
 
         let is_tty = matches!(backend, Backend::Tty(_));
@@ -2527,6 +2530,7 @@ impl Niri {
             screencopy_state,
             viewporter_state,
             background_effect_state,
+            alpha_modifier_state,
             xdg_foreign_state,
             text_input_state,
             input_method_state,

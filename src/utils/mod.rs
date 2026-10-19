@@ -25,6 +25,7 @@ use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel;
 use smithay::reexports::wayland_server::protocol::wl_surface::WlSurface;
 use smithay::reexports::wayland_server::{Client, DisplayHandle, Resource as _};
 use smithay::utils::{Coordinate, Logical, Point, Rectangle, Size, Transform};
+use smithay::wayland::alpha_modifier::AlphaModifierSurfaceCachedState;
 use smithay::wayland::compositor::{send_surface_state, with_states, SurfaceData};
 use smithay::wayland::fractional_scale::with_fractional_scale;
 use smithay::wayland::shell::xdg::{
@@ -338,6 +339,16 @@ pub fn surface_geo(states: &SurfaceData) -> Option<Rectangle<i32, Logical>> {
             loc: view.offset,
             size: view.dst,
         })
+}
+
+/// Returns the surface's wp_alpha_modifier multiplier, or 1 if it doesn't have one.
+pub fn surface_alpha(states: &SurfaceData) -> f32 {
+    states
+        .cached_state
+        .get::<AlphaModifierSurfaceCachedState>()
+        .current()
+        .multiplier_f32()
+        .unwrap_or(1.)
 }
 
 pub fn with_toplevel_role<T>(

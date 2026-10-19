@@ -81,6 +81,7 @@ pub struct XrayElement {
     saturation: f32,
     bg_color: Color32F,
     program: Option<GlesTexProgram>,
+    alpha: f32,
 }
 
 impl Xray {
@@ -102,6 +103,7 @@ impl Xray {
         blur: bool,
         noise: f32,
         saturation: f32,
+        alpha: f32,
         push: &mut dyn FnMut(XrayElement),
     ) {
         let program = Shaders::get(ctx.renderer).postprocess_and_clip.clone();
@@ -202,6 +204,7 @@ impl Xray {
                     saturation,
                     bg_color: *bg_color,
                     program: program.clone(),
+                    alpha,
                 };
                 push(elem);
             }
@@ -252,6 +255,7 @@ impl Xray {
                 saturation,
                 bg_color: self.backdrop_color,
                 program: program.clone(),
+                alpha,
             };
             push(elem);
         }
@@ -293,6 +297,10 @@ impl Element for XrayElement {
         // FIXME: if bg_color alpha is 1 then compute opaque regions here taking corners into
         // account
         OpaqueRegions::default()
+    }
+
+    fn alpha(&self) -> f32 {
+        self.alpha
     }
 }
 
@@ -350,7 +358,7 @@ impl RenderElement<GlesRenderer> for XrayElement {
             // FIXME: opaque regions need to be filtered like damage.
             &[],
             Transform::Normal,
-            1.,
+            self.alpha,
             self.program.as_ref(),
             uniforms,
         )
